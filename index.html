@@ -7,10 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <meta property="og:title" content="Liste des utilisateurs sanctionnés">
-    <meta property="og:description" content="Découvrez les informations sur les sanctions des différents utilisateurs sur France Roleplay">
-    <meta property="og:image" content="https://franceroleplay.github.io/France-RolePlay/L.jpeg">
-    <meta property="twitter:card" content="https://franceroleplay.github.io/France-RolePlay/L.jpeg">
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -36,7 +32,6 @@
         .search-bar {
             margin-bottom: 20px;
             position: relative;
-            display: none; /* Par défaut, cachée si un ID est présent */
         }
 
         .search-bar input {
@@ -127,6 +122,11 @@
             border-radius: 5px;
             color: #fff;
         }
+.kick-color {
+    background-color: #FFA500; 
+border-radius: 5px;
+            color: #fff;
+}
 
         .load-more-container {
             text-align: center;
@@ -140,7 +140,6 @@
             color: #fff;
             cursor: pointer;
             border-radius: 5px;
-            margin-top: 20px;
             display: inline-block;
         }
 
@@ -161,6 +160,36 @@
 
         .return-button:hover {
             background-color: #2980b9;
+        }
+
+        .moderation-tips {
+            background-color: #1c1c1c;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #fff;
+            text-align: left;
+        }
+
+        .moderation-tips h3 {
+            margin-bottom: 10px;
+            color: #f39c12;
+        }
+
+        .moderation-tips ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .moderation-tips li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #222;
+            border-radius: 5px;
+        }
+
+        .moderation-tips.hidden {
+            display: none;
         }
 
     </style>
@@ -188,7 +217,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     <script>
-        const users = [
+const users = [
+            
 {
         "id": 1,
         "username": "Noobdu89",
@@ -604,13 +634,15 @@
         "duree": "n/a",
         "raison": "Free Punch",
         "sanctionnee_par": "Bananous"
-    },
+    }
         ];
 
         const sanctionLog = document.getElementById('sanctionLog');
         const searchInput = document.getElementById('searchInput');
         const searchBar = document.getElementById('searchBar');
         const loadMoreButton = document.getElementById('loadMoreButton');
+        const tipsList = document.getElementById('tipsList');
+        const loadMoreTipsButton = document.getElementById('loadMoreTipsButton');
         let currentIndex = 0;
         const itemsPerPage = 15;
 
@@ -626,15 +658,13 @@
                     <div class="user-info ${isBan ? 'ban-color' : ''}"><i class="fas fa-gavel"></i><span>Sanction:</span> ${user.sanction}</div>
                     <div class="user-info"><i class="fas fa-clock"></i><span>Durée:</span> ${user.duree}</div>
                     <div class="user-info"><i class="fas fa-info-circle"></i><span>Raison:</span> ${user.raison}</div>
-                    <div class="user-info"><i class="fas fa-user-shield"></i><span>Sanctionné par:</span> ${user.sanctionnee_par}</div>
+                    <div class="user-info"><i class="fas fa-user-shield"></i><span>Sanctionné par:</span> ${user.sanctionne_par}</div>
                     <div class="share-container">
                         <input type="text" value="${window.location.href}?id=${user.id}" readonly>
                         <button onclick="copyLink('${user.id}')">Copier</button>
                     </div>
                 `;
-               
-
- sanctionLog.appendChild(bubble);
+                sanctionLog.appendChild(bubble);
                 setTimeout(() => bubble.classList.add('show'), 100); // Animation
             });
         }
@@ -672,15 +702,18 @@
             }
         }
 
-        // Fonction pour copier le lien du profil d'utilisateur
-        function copyLink(id) {
-            const url = `${window.location.href}?id=${id}`;
-            navigator.clipboard.writeText(url).then(() => {
-                console.log('Lien copié :', url);
-            }).catch(err => {
-                console.error('Erreur lors de la copie du lien :', err);
-            });
-        }
+function copyLink(id) {
+    const url = `${window.location.href}?id=${id}`;
+    navigator.clipboard.writeText(url).then(() => {
+        const button = document.querySelector(`button[onclick="copyLink('${id}')"]`);
+        button.textContent = 'Lien copié !';
+        setTimeout(() => {
+            button.textContent = 'Copier';
+        }, 2000); // 2 secondes avant de revenir à l'état normal
+    }).catch(err => {
+        console.error('Erreur lors de la copie du lien :', err);
+    });
+}
 
         // Fonction pour filtrer les utilisateurs avec la barre de recherche
         function filterUsers() {
@@ -702,7 +735,6 @@
         if (userId) {
             displayUserById(Number(userId)); // Affiche uniquement l'utilisateur correspondant à l'ID dans l'URL
         } else {
-            searchBar.style.display = 'block'; // Affiche la barre de recherche si aucun ID
             renderUserBubbles(users, 0, itemsPerPage); // Sinon, affiche les 15 premières bulles
         }
 
@@ -713,6 +745,9 @@
 
         // Écouteur pour le bouton Charger Plus
         loadMoreButton.addEventListener('click', loadMoreUsers);
+
+        // Afficher les conseils pour les modérateurs
+        displayModerationTips(users);
 
     </script>
 </body>
