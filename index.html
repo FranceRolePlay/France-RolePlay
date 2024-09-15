@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste Utilisateurs Sanctionnés</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #000;
+            color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-bar input {
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .search-bar input.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .user-bubble {
+            background-color: #222;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #fff;
+            color: #fff;
+        }
+
+        .user-info {
+            margin-bottom: 10px;
+        }
+
+        .user-info i {
+            margin-right: 8px;
+        }
+
+        .user-info span {
+            font-weight: bold;
+        }
+
+        .share-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .share-container input {
+            flex: 1;
+            background-color: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .share-container button {
+            background-color: #f39c12;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .share-container button:hover {
+            background-color: #e67e22;
+        }
+
+        .floater {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        /* Style pour agrandir la bulle */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .overlay-content {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 80%;
+            position: relative;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+
+        .overlay .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .ban-color {
+            background-color: #e74c3c;
+            padding: 5px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .expand-button {
+            background-color: #f39c12;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .expand-button:hover {
+            background-color: #e67e22;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>LST UTILISATEURS SANCTIONNÉS</h2>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par utilisateur ou raison...">
+        </div>
+
+        <div class="sanction-log" id="sanctionLog">
+            <!-- Bulles des utilisateurs affichées dynamiquement -->
+        </div>
+    </div>
+
+    <!-- Overlay pour l'agrandissement des bulles -->
+    <div class="overlay" id="overlay">
+        <div class="overlay-content" id="overlayContent">
+            <span class="close" id="closeOverlay">&times;</span>
+            <!-- Contenu dynamique ajouté ici -->
+        </div>
+    </div>
+
+    <div class="floater">
+        © 2024 France Roleplay. Tous droits réservés.
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const users = [
+    {
+        "id": 1,
+        "username": "Noobdu89",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin1"
+    },
+    {
+        "id": 2,
+        "username": "N0t00x",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin2"
+    },
+    {
+        "id": 3,
+        "username": "krazy",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin3"
+    },
+    {
+        "id": 4,
+        "username": "citrouillea",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin4"
+    },
+    {
+        "id": 5,
+        "username": "HCB_Eco",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin5"
+    },
+    {
+        "id": 6,
+        "username": "kaisfotgaga",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin6"
+    },
+    {
+        "id": 7,
+        "username": "vodor_21",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin7"
+    },
+    {
+        "id": 8,
+        "username": "vodor_21",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin7"
+    },
+    {
+        "id": 9,
+        "username": "vodor_21",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin7"
+    },
+    {
+        "id": 10,
+        "username": "vodor_21",
+        "sanction": "Bannissement",
+        "duree": "Permanent",
+        "raison": "Multiples avertissements",
+        "sanctionnee_par": "Admin7"
+    },
+    {
+        "id": 11,
+        "username": "Vince_0758",
+        "sanction": "Bannissement",
+        "duree": "Permanent",
+        "raison": "Freekill répétés et autres raisons",
+        "sanctionnee_par": "Admin8"
+    },
+    {
+        "id": 12,
+        "username": "Xenonlebg705",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin9"
+    },
+    {
+        "id": 13,
+        "username": "Bapt9250",
+        "sanction": "Bannissement",
+        "duree": "1j",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin10"
+    },
+    {
+        "id": 14,
+        "username": "erenkutlu27",
+        "sanction": "Bannissement",
+        "duree": "1j",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin11"
+    },
+    {
+        "id": 15,
+        "username": "node_desele",
+        "sanction": "Bannissement",
+        "duree": "Permanent",
+        "raison": "Freekill Admin",
+        "sanctionnee_par": "Admin12"
+    },
+    {
+        "id": 16,
+        "username": "LeRat_TPL",
+        "sanction": "Bannissement",
+        "duree": "Permanent",
+        "raison": "Freekill Admin",
+        "sanctionnee_par": "Admin12"
+    },
+    {
+        "id": 17,
+        "username": "trollyfacecult",
+        "sanction": "Bannissement",
+        "duree": "Permanent",
+        "raison": "Freekill Admin",
+        "sanctionnee_par": "Admin12"
+    },
+    {
+        "id": 18,
+        "username": "Fabrice",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin13"
+    },
+    {
+        "id": 19,
+        "username": "Tw_Zoro",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin14"
+    },
+    {
+        "id": 20,
+        "username": "angeloleboss21",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin15"
+    },
+    {
+        "id": 21,
+        "username": "SuperHmarr",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin16"
+    },
+    {
+        "id": 22,
+        "username": "RxzPRIMEE",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin17"
+    },
+    {
+        "id": 23,
+        "username": "Le_C",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin18"
+    },
+    {
+        "id": 24,
+        "username": "Tintin",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin19"
+    },
+    {
+        "id": 25,
+        "username": "ramini911",
+        "sanction": "Bannissement",
+        "duree": "2j",
+        "raison": "Insulte Admin",
+        "sanctionnee_par": "Admin20"
+    },
+    {
+        "id": 26,
+        "username": "Fabrice",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin13"
+    },
+    {
+        "id": 27,
+        "username": "Tw_zoro",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "Abusing cuff",
+        "sanctionnee_par": "Admin14"
+    },
+    {
+        "id": 28,
+        "username": "A618",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin21"
+    },
+    {
+        "id": 29,
+        "username": "syyriana",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin22"
+    },
+    {
+        "id": 30,
+        "username": "syyriana",
+        "sanction": "Bannissement",
+        "duree": "1s",
+        "raison": "Insultes répétés",
+        "sanctionnee_par": "Admin22"
+    },
+    {
+        "id": 31,
+        "username": "anna_nask02",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin23"
+    },
+    {
+        "id": 32,
+        "username": "WIBEE",
+        "sanction": "Démission de fonction",
+        "duree": "n/a",
+        "raison": "Abus de pouvoir",
+        "sanctionnee_par": "Admin24"
+    },
+    {
+        "id": 33,
+        "username": "Tintin",
+        "sanction": "Avertissement",
+        "duree": "n/a",
+        "raison": "n/a",
+        "sanctionnee_par": "Admin19"
+    }
+];
+
+        const sanctionLog = document.getElementById('sanctionLog');
+        const overlay = document.getElementById('overlay');
+        const overlayContent = document.getElementById('overlayContent');
+        const closeOverlay = document.getElementById('closeOverlay');
+        const searchInput = document.getElementById('searchInput');
+
+        function renderUserBubbles(users) {
+            sanctionLog.innerHTML = ''; // Clear previous content
+            users.forEach(user => {
+                const bubble = document.createElement('div');
+                bubble.classList.add('user-bubble');
+                const isBan = user.sanction.toLowerCase().includes('bannissement');
+                bubble.innerHTML = `
+                    <div class="user-info"><i class="fas fa-user"></i><span>Utilisateur:</span> ${user.username}</div>
+                    <div class="user-info ${isBan ? 'ban-color' : ''}"><i class="fas fa-gavel"></i><span>Sanction:</span> ${user.sanction}</div>
+                    <div class="user-info"><i class="fas fa-clock"></i><span>Durée:</span> ${user.duree}</div>
+                    <div class="user-info"><i class="fas fa-info-circle"></i><span>Raison:</span> ${user.raison}</div>
+                    <div class="user-info"><i class="fas fa-user-shield"></i><span>Sanctionné par:</span> ${user.sanctionnee_par}</div>
+                    <div class="share-container">
+                        <input type="text" value="${window.location.href}?id=${user.id}" readonly>
+                        <button onclick="copyLink('${user.id}')">Copier</button>
+                    </div>
+                    <button class="expand-button" onclick="enlargeBubble(${user.id})">Agrandir</button>
+                `;
+                sanctionLog.appendChild(bubble);
+            });
+        }
+
+        function enlargeBubble(id) {
+            const user = users.find(u => u.id === id);
+            overlay.style.display = 'flex';
+            overlayContent.innerHTML = `
+                <span class="close" id="closeOverlay">&times;</span>
+                <div class="user-info"><i class="fas fa-user"></i><span>Utilisateur:</span> ${user.username}</div>
+                <div class="user-info"><i class="fas fa-gavel"></i><span>Sanction:</span> ${user.sanction
+
+}</div>
+                <div class="user-info"><i class="fas fa-clock"></i><span>Durée:</span> ${user.duree}</div>
+                <div class="user-info"><i class="fas fa-info-circle"></i><span>Raison:</span> ${user.raison}</div>
+                <div class="user-info"><i class="fas fa-user-shield"></i><span>Sanctionné par:</span> ${user.sanctionne_par}</div>
+            `;
+            document.getElementById('closeOverlay').addEventListener('click', () => {
+                overlay.style.display = 'none';
+            });
+        }
+
+        function copyLink(id) {
+            const url = `${window.location.href}?id=${id}`;
+            navigator.clipboard.writeText(url).then(() => {
+                console.log('Lien copié :', url);
+            }).catch(err => {
+                console.error('Erreur lors de la copie du lien :', err);
+            });
+        }
+
+        function filterUsers() {
+            const query = searchInput.value.toLowerCase();
+            const filteredUsers = users.filter(user => 
+                user.username.toLowerCase().includes(query) ||
+                user.raison.toLowerCase().includes(query)
+            );
+            renderUserBubbles(filteredUsers);
+        }
+
+        searchInput.addEventListener('input', filterUsers);
+
+        // Ajoute une animation lors de l'affichage de la barre de recherche
+        setTimeout(() => {
+            searchInput.classList.add('show');
+        }, 300);
+
+        // Render the bubbles on page load
+        renderUserBubbles(users);
+    </script>
+</body>
+</html>
