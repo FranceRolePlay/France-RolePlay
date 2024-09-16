@@ -196,7 +196,7 @@ border-radius: 5px;
 </head>
 <body>
     <div class="container">
-        <h2>LST UTILISATEURS SANCTIONNÉS</h2>
+        <h2>LISTE DES UTILISATEURS SANCTIONNÉS</h2>
 
         <div class="search-bar" id="searchBar">
             <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par utilisateur ou raison...">
@@ -658,7 +658,7 @@ const users = [
                     <div class="user-info ${isBan ? 'ban-color' : ''}"><i class="fas fa-gavel"></i><span>Sanction:</span> ${user.sanction}</div>
                     <div class="user-info"><i class="fas fa-clock"></i><span>Durée:</span> ${user.duree}</div>
                     <div class="user-info"><i class="fas fa-info-circle"></i><span>Raison:</span> ${user.raison}</div>
-                    <div class="user-info"><i class="fas fa-user-shield"></i><span>Sanctionné par:</span> ${user.sanctionne_par}</div>
+                    <div class="user-info"><i class="fas fa-user-shield"></i><span>Sanctionné par:</span> ${user.sanctionnee_par}</div>
                     <div class="share-container">
                         <input type="text" value="${window.location.href}?id=${user.id}" readonly>
                         <button onclick="copyLink('${user.id}')">Copier</button>
