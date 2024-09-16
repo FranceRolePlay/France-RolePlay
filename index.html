@@ -182,7 +182,7 @@ border-radius: 5px;
         <h2>LISTE DES UTILISATEURS SANCTIONNÉS</h2>
 
             <div class="banniere-mise-a-jour" id="banniere">
-        Dernière mise à jour des données : <span id="date-maj">16 septembre 2024</span> (<span id="temps-ecoule"></span>)
+        Dernière mise à jour des données : <span id="date-maj">16 septembre 2024</span> 
     </div>
         <div class="search-bar" id="searchBar">
             <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par utilisateur ou raison...">
@@ -731,43 +731,6 @@ function copyLink(id) {
 
         // Écouteur pour le bouton Charger Plus
         loadMoreButton.addEventListener('click', loadMoreUsers);
-
-        // Afficher les conseils pour les modérateurs
-        displayModerationTips(users);
-
-        function tempsEcouleDepuis(date) {
-            const maintenant = new Date();
-            const dateMAJ = new Date(date);
-            const ecart = maintenant - dateMAJ;
-
-            const secondes = Math.floor(ecart / 1000);
-            const minutes = Math.floor(secondes / 60);
-            const heures = Math.floor(minutes / 60);
-            const jours = Math.floor(heures / 24);
-            const mois = Math.floor(jours / 30);
-            const annees = Math.floor(mois / 12);
-
-            if (annees > 0) {
-                return `${annees} an${annees > 1 ? 's' : ''}`;
-            } else if (mois > 0) {
-                return `${mois} mois`;
-            } else if (jours > 0) {
-                return `${jours} jour${jours > 1 ? 's' : ''}`;
-            } else if (heures > 0) {
-                return `${heures} heure${heures > 1 ? 's' : ''}`;
-            } else if (minutes > 0) {
-                return `${minutes} minute${minutes > 1 ? 's' : ''}`;
-            } else {
-                return `${secondes} seconde${secondes > 1 ? 's' : ''}`;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const dateDerniereMaj = '2024-09-16';  // Format YYYY-MM-DD
-            const tempsEcoule = tempsEcouleDepuis(dateDerniereMaj);
-
-            document.getElementById('temps-ecoule').textContent = `il y a ${tempsEcoule}`;
-        });
     </script>
 </body>
 </html>
