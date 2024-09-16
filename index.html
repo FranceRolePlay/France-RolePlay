@@ -162,34 +162,17 @@ border-radius: 5px;
             background-color: #2980b9;
         }
 
-        .moderation-tips {
+        .banniere-mise-a-jour {
             background-color: #1c1c1c;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            color: #fff;
-            text-align: left;
-        }
-
-        .moderation-tips h3 {
-            margin-bottom: 10px;
-            color: #f39c12;
-        }
-
-        .moderation-tips ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-
-        .moderation-tips li {
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #222;
+            color: #f0f0f0;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 18px;
+            border: 1px solid #333;
             border-radius: 5px;
-        }
-
-        .moderation-tips.hidden {
-            display: none;
+            margin: 20px auto;
+            width: fit-content;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
     </style>
@@ -198,6 +181,9 @@ border-radius: 5px;
     <div class="container">
         <h2>LISTE DES UTILISATEURS SANCTIONNÉS</h2>
 
+            <div class="banniere-mise-a-jour" id="banniere">
+        Dernière mise à jour des données : <span id="date-maj">16 septembre 2024</span> (<span id="temps-ecoule"></span>)
+    </div>
         <div class="search-bar" id="searchBar">
             <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par utilisateur ou raison...">
         </div>
@@ -749,6 +735,39 @@ function copyLink(id) {
         // Afficher les conseils pour les modérateurs
         displayModerationTips(users);
 
+        function tempsEcouleDepuis(date) {
+            const maintenant = new Date();
+            const dateMAJ = new Date(date);
+            const ecart = maintenant - dateMAJ;
+
+            const secondes = Math.floor(ecart / 1000);
+            const minutes = Math.floor(secondes / 60);
+            const heures = Math.floor(minutes / 60);
+            const jours = Math.floor(heures / 24);
+            const mois = Math.floor(jours / 30);
+            const annees = Math.floor(mois / 12);
+
+            if (annees > 0) {
+                return `${annees} an${annees > 1 ? 's' : ''}`;
+            } else if (mois > 0) {
+                return `${mois} mois`;
+            } else if (jours > 0) {
+                return `${jours} jour${jours > 1 ? 's' : ''}`;
+            } else if (heures > 0) {
+                return `${heures} heure${heures > 1 ? 's' : ''}`;
+            } else if (minutes > 0) {
+                return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+            } else {
+                return `${secondes} seconde${secondes > 1 ? 's' : ''}`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateDerniereMaj = '2024-09-16';  // Format YYYY-MM-DD
+            const tempsEcoule = tempsEcouleDepuis(dateDerniereMaj);
+
+            document.getElementById('temps-ecoule').textContent = `il y a ${tempsEcoule}`;
+        });
     </script>
 </body>
 </html>
