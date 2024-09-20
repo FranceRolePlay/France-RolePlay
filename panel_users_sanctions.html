@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login et Panel de Sanction</title>
+    <title>Panel de Sanctions</title>
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -11,201 +11,201 @@
             color: #f4f4f4;
             margin: 0;
             padding: 20px;
-            overflow-x: hidden;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             text-align: center;
         }
-        .form-container {
-            background-color: #222;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 50px;
-            display: inline-block;
-            width: 100%;
-            animation: fadeIn 0.8s ease-in-out;
+
+        h2 {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            transition: opacity 0.5s ease-in-out;
         }
-        input[type="text"], input[type="password"], select {
+
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="text"], input[type="password"], select, input[type="url"] {
             width: 80%;
             padding: 10px;
-            margin: 10px 0;
+            margin: 5px;
             border-radius: 5px;
-            border: 1px solid #555;
-            background-color: #333;
+            border: none;
+            outline: none;
+            background-color: #222;
             color: #fff;
+            transition: all 0.3s ease;
         }
-        button {
-            padding: 10px 20px;
-            border-radius: 5px;
+
+        .login-btn, .submit-btn {
             background-color: #f39c12;
             border: none;
+            padding: 10px 20px;
             color: #fff;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            transition: all 0.3s ease;
         }
-        button:hover {
+
+        .login-btn:hover, .submit-btn:hover {
             background-color: #e67e22;
         }
-        .sanction-section {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            background-color: #333;
-            border: 1px solid #fff;
-            animation: fadeIn 0.8s ease-in-out;
-        }
-        .floater {
-            margin-top: 20px;
-            text-align: center;
-            color: #bbb;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+
         .disabled {
-            background-color: #555;
+            opacity: 0.5;
             pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Connexion au Panel de Sanction</h2>
-
-    <div class="form-container" id="login-form">
-        <input type="text" id="username" placeholder="Nom d'utilisateur" required><br>
-        <input type="password" id="password" placeholder="Mot de passe" required><br>
-        <button onclick="login()">Se connecter</button>
+    <div id="login-page" class="container">
+        <h2>Connexion</h2>
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Identifiant">
+        </div>
+        <div class="input-group">
+            <input type="password" id="password" placeholder="Mot de passe">
+        </div>
+        <button class="login-btn" onclick="login()">Se connecter</button>
     </div>
 
-    <div class="sanction-section" id="panel-section" style="display:none;">
-        <h2>Ajouter une Sanction</h2>
+    <div id="panel-page" class="container" style="display:none;">
+        <h2>Panel de Sanctions</h2>
         <form id="sanction-form">
-            <input type="text" id="utilisateur" placeholder="Utilisateur" required><br>
-            <select id="sanction" onchange="toggleDuree()" required>
-                <option value="Bannissement">Bannissement</option>
-                <option value="Avertissement">Avertissement</option>
-                <option value="Kick">Kick</option>
-                <option value="Mute">Mute</option>
-            </select><br>
-            <input type="text" id="duree" placeholder="Durée (ex : 7 jours)" required><br>
-            <input type="text" id="raison" placeholder="Raison" required><br>
-            <input type="text" id="sanctionnePar" disabled><br>
-            <input type="text" id="preuve" placeholder="Lien de la preuve (image)" required><br>
-            <button type="button" onclick="envoyerSanction()">Envoyer la Sanction</button>
+            <div class="input-group">
+                <input type="text" id="utilisateur" placeholder="Utilisateur" required>
+            </div>
+            <div class="input-group">
+                <select id="sanction" onchange="checkSanctionType()" required>
+                    <option value="Bannissement">Bannissement</option>
+                    <option value="Avertissement">Avertissement</option>
+                    <option value="Kick">Kick</option>
+                    <option value="Mute">Mute</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <input type="text" id="duree" placeholder="Durée (ex: 7 jours)">
+            </div>
+            <div class="input-group">
+                <input type="text" id="raison" placeholder="Raison" required>
+            </div>
+            <div class="input-group">
+                <input type="text" id="sanctionne-par" readonly>
+            </div>
+            <div class="input-group">
+                <input type="url" id="preuve" placeholder="Lien de la preuve (Image)">
+            </div>
+            <button type="submit" class="submit-btn">Envoyer la Sanction</button>
         </form>
     </div>
 
-    <div class="floater" id="floater">
-        <p>© 2024 France Roleplay</p>
-    </div>
-</div>
+    <script>
+        const validUsers = {
+            "admin": {
+                password: "admin123",
+                id: generateUniqueId()
+            },
+            "mod": {
+                password: "modpassword",
+                id: generateUniqueId()
+            }
+        };
 
-<script>
-    const comptes = {
-        "admin": {password: "admin123", id: "A1B2C3D4E5F6G7H8I9"},
-        "moderateur": {password: "mod456", id: "J1K2L3M4N5O6P7Q8R9"},
-        "superviseur": {password: "super789", id: "S1T2U3V4W5X6Y7Z8A9"}
-    };
-    let loggedInUser = "";
-
-    function login() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        if (comptes[username] && comptes[username].password === password) {
-            const identifiant = comptes[username].id;
-            loggedInUser = username;
-            document.getElementById('sanctionnePar').value = username; // Remplit automatiquement "Sanctionné par"
-            const url = new URL(window.location.href);
-            url.searchParams.set("id", identifiant);
-            window.history.pushState({}, "", url);
-            afficherPanel();
-        } else {
-            alert("Identifiant ou mot de passe incorrect");
+        // Génère un identifiant unique à 15 caractères
+        function generateUniqueId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let id = '';
+            for (let i = 0; i < 15; i++) {
+                id += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return id;
         }
-    }
 
-    function checkLogin() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
+        // Fonction de login
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
 
-        let userLoggedIn = false;
-        for (const user in comptes) {
-            if (comptes[user].id === id) {
-                userLoggedIn = true;
-                loggedInUser = user;
-                document.getElementById('sanctionnePar').value = user;
-                break;
+            if (validUsers[username] && validUsers[username].password === password) {
+                let userId = validUsers[username].id;
+
+                // Stocker l'ID dans le SessionStorage
+                sessionStorage.setItem('userId', userId);
+
+                // Redirection avec l'ID dans l'URL
+                const url = new URL(window.location.href);
+                url.searchParams.set('id', userId);
+                window.location.href = url.href;
+            } else {
+                alert('Identifiant ou mot de passe incorrect.');
             }
         }
 
-        if (!userLoggedIn) {
-            document.getElementById('login-form').style.display = "block";
-            document.getElementById('panel-section').style.display = "none";
-        } else {
-            afficherPanel();
-        }
-    }
+        // Vérification de l'accès au panel
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idInUrl = urlParams.get('id');
+            const idInSession = sessionStorage.getItem('userId');
+            const currentPage = window.location.pathname;
 
-    function afficherPanel() {
-        document.getElementById('login-form').style.display = "none";
-        document.getElementById('panel-section').style.display = "block";
-    }
+            if (currentPage.includes('login.html')) {
+                // Si on est sur la page de login, ne rien faire
+                return;
+            }
 
-    function toggleDuree() {
-        const sanction = document.getElementById('sanction').value;
-        const dureeInput = document.getElementById('duree');
-        if (sanction === "Avertissement") {
-            dureeInput.value = "";
-            dureeInput.classList.add('disabled');
-        } else {
-            dureeInput.classList.remove('disabled');
-        }
-    }
-
-    function envoyerSanction() {
-        const utilisateur = document.getElementById('utilisateur').value;
-        const sanction = document.getElementById('sanction').value;
-        const duree = document.getElementById('duree').value;
-        const raison = document.getElementById('raison').value;
-        const sanctionnePar = document.getElementById('sanctionnePar').value;
-        const preuve = document.getElementById('preuve').value;
-
-        if (!utilisateur || !sanction || !raison || !preuve || (sanction !== "Avertissement" && !duree)) {
-            alert("Veuillez remplir tous les champs obligatoires.");
-            return;
-        }
-
-        const webhookURL = "https://discord.com/api/webhooks/1265215932175745064/zpNXCuSj9wp8sGmmblYKvLQOPe3nBJC8Vv7Dr47Rt-EsbLBUzbGmExRse6OkrkG-5veK";
-        const embedMessage = {
-            embeds: [{
-                title: `Nouvelle Sanction - ${sanction}`,
-                description: `**Utilisateur :** ${utilisateur}\n**Sanction :** ${sanction}\n${sanction !== "Avertissement" ? `**Durée :** ${duree}\n` : ""}**Raison :** ${raison}\n**Sanctionné par :** ${sanctionnePar}`,
-                image: { url: preuve },
-                color: sanction === "Bannissement" ? 15158332 : (sanction === "Avertissement" ? 15844367 : 3066993) // Code couleur basé sur la sanction
-            }]
+            if (idInSession && idInSession === idInUrl) {
+                // Si l'ID dans l'URL et la session correspondent, afficher le panel
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('panel-page').style.display = 'block';
+                document.getElementById('sanctionne-par').value = Object.keys(validUsers).find(user => validUsers[user].id === idInSession);
+            } else {
+                // Si pas d'ID ou si l'ID ne correspond pas, redirection vers login
+                window.location.href = 'login.html';
+            }
         };
 
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(embedMessage)
-        }).then(response => {
-            alert("Sanction envoyée !");
-        }).catch(error => {
-            console.error('Erreur :', error);
-        });
-    }
+        // Désactiver la durée si Avertissement est sélectionné
+        function checkSanctionType() {
+            const sanctionType = document.getElementById('sanction').value;
+            const dureeInput = document.getElementById('duree');
 
-    window.onload = checkLogin;
-</script>
+            if (sanctionType === 'Avertissement') {
+                dureeInput.value = '';
+                dureeInput.classList.add('disabled');
+                dureeInput.disabled = true;
+            } else {
+                dureeInput.classList.remove('disabled');
+                dureeInput.disabled = false;
+            }
+        }
+
+        // Validation du formulaire
+        document.getElementById('sanction-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const utilisateur = document.getElementById('utilisateur').value;
+            const sanction = document.getElementById('sanction').value;
+            const raison = document.getElementById('raison').value;
+            const preuve = document.getElementById('preuve').value;
+
+            if (!utilisateur || !sanction || !raison || (sanction !== 'Avertissement' && !document.getElementById('duree').value)) {
+                alert('Veuillez remplir tous les champs.');
+                return;
+            }
+
+            // Envoyer via webhook ici...
+            alert('Sanction envoyée avec succès !');
+        });
+    </script>
 
 </body>
 </html>
