@@ -157,17 +157,22 @@
             const idInSession = sessionStorage.getItem('userId');
             const currentPage = window.location.pathname;
 
+            console.log("ID dans l'URL: ", idInUrl); // Debug
+            console.log("ID dans le SessionStorage: ", idInSession); // Debug
+
             if (currentPage.includes('login.html')) {
                 // Si on est sur la page de login, ne rien faire
                 return;
             }
 
             if (idInSession && idInSession === idInUrl) {
+                console.log("Les IDs correspondent, affichage du panel."); // Debug
                 // Si l'ID dans l'URL et la session correspondent, afficher le panel
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('panel-page').style.display = 'block';
                 document.getElementById('sanctionne-par').value = Object.keys(validUsers).find(user => validUsers[user].id === idInSession);
             } else {
+                console.log("Les IDs ne correspondent pas, redirection vers login."); // Debug
                 // Si pas d'ID ou si l'ID ne correspond pas, redirection vers login
                 window.location.href = 'login.html';
             }
