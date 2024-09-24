@@ -125,79 +125,87 @@
 </div>
 
     <script>
-        // Vérification de la correspondance entre l'ID dans l'URL et dans le SessionStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlUserID = urlParams.get('userID');
-        const sessionUserID = sessionStorage.getItem("userID");
+// Vérification de la correspondance entre l'ID dans l'URL et dans le SessionStorage
+const urlParams = new URLSearchParams(window.location.search);
+const urlUserID = urlParams.get('userID');
+const sessionUserID = sessionStorage.getItem("userID");
 
-        if (!sessionUserID || sessionUserID !== urlUserID) {
-            window.location.href = 'login.html';
+if (!sessionUserID || sessionUserID !== urlUserID) {
+    window.location.href = 'login.html';
+} else {
+    const username = sessionStorage.getItem("username");
+    document.getElementById('welcome-message').textContent = `Utilisateur connecté : ${username}`;
+    document.getElementById('sanctioned-by').value = username;  // Remplir automatiquement le champ "Sanctionné par"
+}
+
+function logout() {
+    // Suppression de l'ID et du nom d'utilisateur du sessionStorage pour la déconnexion
+    sessionStorage.removeItem("userID");
+    sessionStorage.removeItem("username");
+    window.location.href = 'login.html';  // Redirection vers login.html
+}
+
+// Désactiver le champ durée pour "Avertissement"
+document.getElementById('sanction-type').addEventListener('change', function() {
+    const sanctionType = this.value;
+    const durationField = document.getElementById('duration');
+    
+    if (sanctionType === 'Avertissement') {
+        durationField.disabled = true;
+        durationField.value = ''; // Réinitialiser la durée pour les avertissements
+    } else {
+        durationField.disabled = false;
+    }
+});
+
+// Gestion de l'envoi des données au webhook Discord
+document.getElementById('sanction-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const userToSanction = document.getElementById('user-to-sanction').value;
+    const sanctionType = document.getElementById('sanction-type').value;
+    const duration = sanctionType === 'Avertissement' ? 'Permanent' : document.getElementById('duration').value;
+    const reason = document.getElementById('reason').value;
+    const sanctionedBy = document.getElementById('sanctioned-by').value;
+
+    const webhookURL = 'https://discord.com/api/webhooks/1265215932175745064/zpNXCuSj9wp8sGmmblYKvLQOPe3nBJC8Vv7Dr47Rt-EsbLBUzbGmExRse6OkrkG-5veK';
+    const payload = {
+        content: null,
+        embeds: [{
+            title: `Sanction : ${sanctionType}`,
+            description: `**Utilisateur sanctionné** : ${userToSanction}\n**Sanction** : ${sanctionType}\n**Durée** : ${duration}\n**Raison** : ${reason}\n**Sanctionné par** : ${sanctionedBy}`,
+            color: 15158332
+        }]
+    };
+
+    fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Sanction envoyée avec succès !');
+
+            // Stocker la valeur du champ "Sanctionné par" avant de réinitialiser le formulaire
+            const sanctionedByValue = document.getElementById('sanctioned-by').value;
+
+            // Réinitialiser tout le formulaire sauf "Sanctionné par"
+            document.getElementById('sanction-form').reset();
+
+            // Restaurer la valeur du champ "Sanctionné par"
+            document.getElementById('sanctioned-by').value = sanctionedByValue;
         } else {
-            const username = sessionStorage.getItem("username");
-            document.getElementById('welcome-message').textContent = `Utilisateur connecté : ${username}`;
-            document.getElementById('sanctioned-by').value = username;  // Remplir automatiquement le champ "Sanctionné par"
+            alert('Erreur lors de l\'envoi de la sanction.');
         }
-
-        function logout() {
-            // Suppression de l'ID et du nom d'utilisateur du sessionStorage pour la déconnexion
-            sessionStorage.removeItem("userID");
-            sessionStorage.removeItem("username");
-            window.location.href = 'login.html';  // Redirection vers login.html
-        }
-
-        // Désactiver le champ durée pour "Avertissement"
-        document.getElementById('sanction-type').addEventListener('change', function() {
-            const sanctionType = this.value;
-            const durationField = document.getElementById('duration');
-            
-            if (sanctionType === 'Avertissement') {
-                durationField.disabled = true;
-                durationField.value = ''; // Réinitialiser la durée pour les avertissements
-            } else {
-                durationField.disabled = false;
-            }
-        });
-
-        // Gestion de l'envoi des données au webhook Discord
-        document.getElementById('sanction-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const userToSanction = document.getElementById('user-to-sanction').value;
-            const sanctionType = document.getElementById('sanction-type').value;
-            const duration = sanctionType === 'Avertissement' ? 'Permanent' : document.getElementById('duration').value;
-            const reason = document.getElementById('reason').value;
-            const sanctionedBy = document.getElementById('sanctioned-by').value;
-
-            const webhookURL = 'https://discord.com/api/webhooks/1287874334416834612/XMOUAil1Y8vK7zH8oFPJVwAZU7R8L0jAv9I1VAMHNuGwGTOl09-CLO_U-cQcRnATqXgJ';
-            const payload = {
-                content: null,
-                embeds: [{
-                    title: `Sanction : ${sanctionType}`,
-                    description: `**Utilisateur sanctionné** : ${userToSanction}\n**Sanction** : ${sanctionType}\n**Durée** : ${duration}\n**Raison** : ${reason}\n**Sanctionné par** : ${sanctionedBy}`,
-                    color: 15158332
-                }]
-            };
-
-            fetch(webhookURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Sanction envoyée avec succès !');
-                    document.getElementById('sanction-form').reset();
-                } else {
-                    alert('Erreur lors de l\'envoi de la sanction.');
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                alert('Erreur lors de l\'envoi de la sanction.');
-            });
-        });
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert('Erreur lors de l\'envoi de la sanction.');
+    });
+});
     </script>
 </body>
 </html>
