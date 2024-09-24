@@ -154,7 +154,7 @@ if (!sessionUserID || sessionUserID !== urlUserID) {
     window.location.href = 'login.html';
 } else {
     const username = sessionStorage.getItem("username");
-    document.getElementById('welcome-message').textContent = `Vous êtes actuellement connecté en tant que : ${username})`;
+    document.getElementById('welcome-message').textContent = `Vous êtes actuellement connecté en tant que : ${username}`;
     document.getElementById('sanctioned-by').value = username;  // Remplir automatiquement le champ "Sanctionné par"
 }
 
@@ -196,7 +196,7 @@ document.getElementById('sanction-form').addEventListener('submit', function(e) 
     const sanctionedBy = document.getElementById('sanctioned-by').value;
 
     if (confirm(`Êtes-vous sûr de vouloir envoyer la sanction pour ${userToSanction} ?`)) {
-        const webhookURL = 'https://discord.com/api/webhooks/1265215932175745064/zpNXCuSj9wp8sGmmblYKvLQOPe3nBJC8Vv7Dr47Rt-EsbLBUzbGmExRse6OkrkG-5veK';
+        const webhookURL = 'https://discord.com/api/webhooks/1287874334416834612/XMOUAil1Y8vK7zH8oFPJVwAZU7R8L0jAv9I1VAMHNuGwGTOl09-CLO_U-cQcRnATqXgJ';
         const payload = {
             content: null,
             embeds: [{
