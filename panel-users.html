@@ -28,12 +28,12 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #222;
-    padding: 30px;
+    padding: 50px; /* Augmente le padding pour un meilleur espacement */
     border-radius: 10px;
     border: 1px solid #fff;
-    width: 90%; /* Ajuste la largeur à 90% de l'écran */
-    max-width: 600px; /* Augmente la largeur maximale pour les grands écrans */
-    min-width: 300px; /* Définit une largeur minimale pour les petits écrans */
+    width: 95%; /* Proche des bords de l'écran */
+    max-width: 1200px; /* Largeur maximale augmentée pour les grands écrans */
+    min-width: 500px; /* Définit une largeur minimale pour les plus petits écrans */
     box-sizing: border-box;
     animation: popup-animation 0.6s ease-out;
 }
@@ -92,13 +92,14 @@ input[type="text"], textarea, select {
 .banniere-mise-a-jour {
     background-color: #1c1c1c;
     color: #f0f0f0;
-    padding: 10px 20px;
+    padding: 20px; /* Augmente la taille du padding pour un rendu plus important */
     text-align: center;
     font-size: 18px;
     border: 1px solid #333;
     border-radius: 5px;
     margin: 20px auto;
-    width: fit-content;
+    width: 90%; /* Adapte la bannière pour être plus large */
+    max-width: 1000px; /* Définit une largeur maximale */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
