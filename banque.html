@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rendez-vous Crédit Agricole</title>
+
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Montserrat Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS for modern design -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        .navbar {
+            background-color: #007A33;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+        }
+
+        .navbar .btn-notify {
+            color: #fff;
+            border: none;
+            background-color: transparent;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background-color: #2c2c2c;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        label {
+            color: #fff;
+            margin-top: 10px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        input[type="submit"] {
+            background-color: #007A33;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #005922;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .footer {
+            background-color: #007A33;
+            padding: 10px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-bubble {
+            background-color: #444;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .history-bubble.future {
+            background-color: #28a745;
+        }
+
+        .history-bubble.today {
+            background-color: #ff9800;
+        }
+
+        .history-bubble.past {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Crédit_Agricole.svg/2560px-Crédit_Agricole.svg.png" alt="Crédit Agricole">
+            </a>
+            <button class="btn-notify" id="notify-btn">
+                <i class="fas fa-bell"></i> Envoyer des notifications
+            </button>
+        </div>
+    </nav>
+
+    <!-- Formulaire de prise de rendez-vous -->
+    <div class="container">
+        <h1><i class="fas fa-calendar-alt"></i> Prendre un rendez-vous</h1>
+        <form id="rendezvous-form">
+            <label for="name">Votre nom :</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="discord">Votre pseudo Discord :</label>
+            <input type="text" id="discord" name="discord" required>
+
+            <label for="appointment-type">Type de rendez-vous :</label>
+            <select id="appointment-type" name="appointment-type" required>
+                <option value="">Sélectionnez le type de rendez-vous</option>
+                <option value="emprunt">Emprunt</option>
+                <option value="retrait">Retrait</option>
+                <option value="creation-compte">Demande de création de compte</option>
+            </select>
+
+            <div id="emprunt-fields" class="hidden">
+                <label for="loan-amount">Montant de l'emprunt (min. 5,000 €) :</label>
+                <input type="number" id="loan-amount" name="loan-amount" min="5000">
+            </div>
+
+            <div id="retrait-fields" class="hidden">
+                <label for="withdrawal-amount">Montant à retirer (min. 1,000 €) :</label>
+                <input type="number" id="withdrawal-amount" name="withdrawal-amount" min="1000">
+            </div>
+
+            <div id="creation-compte-fields" class="hidden">
+                <label for="account-type">Type de compte souhaité :</label>
+                <select id="account-type" name="account-type">
+                    <option value="compte-courant">Compte courant</option>
+                    <option value="compte-epargne">Compte épargne</option>
+                </select>
+            </div>
+
+            <label for="date">Date et heure du rendez-vous :</label>
+            <input type="datetime-local" id="date" name="date" required>
+
+            <input type="submit" value="Prendre rendez-vous">
+        </form>
+
+        <!-- Section historique des rendez-vous -->
+        <div class="history-section">
+            <h2>Historique des rendez-vous</h2>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Crédit Agricole - Tous droits réservés © 2024
+    </div>
+
+    <!-- JS -->
+    <script>
+        // Affichage ou masquage des champs en fonction du type de rendez-vous
+        document.getElementById('appointment-type').addEventListener('change', function() {
+            const type = this.value;
+            document.getElementById('emprunt-fields').classList.add('hidden');
+            document.getElementById('retrait-fields').classList.add('hidden');
+            document.getElementById('creation-compte-fields').classList.add('hidden');
+
+            if (type === 'emprunt') {
+                document.getElementById('emprunt-fields').classList.remove('hidden');
+            } else if (type === 'retrait') {
+                document.getElementById('retrait-fields').classList.remove('hidden');
+            } else if (type === 'creation-compte') {
+                document.getElementById('creation-compte-fields').classList.remove('hidden');
+            }
+        });
+
+        // Formulaire de rendez-vous
+        const form = document.getElementById('rendezvous-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const discord = document.getElementById('discord').value;
+            const appointmentType = document.getElementById('appointment-type').value;
+            const dateTime = new Date(document.getElementById('date').value);
+            const currentTime = new Date();
+
+            // Vérification des heures disponibles
+            const day = dateTime.getDay();
+            const hour = dateTime.getHours();
+            let isValid = false;
+
+            if (day === 3 && hour >= 16 && hour < 22) { // Mercredi
+                isValid = true;
+            } else if (day === 6 || day === 0) { // Samedi ou Dimanche
+                if (hour >= 10 && hour < 23) {
+                    isValid = true;
+                }
+            }
+
+            if (!isValid) {
+                alert("La date et l'heure choisies ne sont pas disponibles.");
+                return;
+            }
+
+            let additionalInfo = '';
+
+            if (appointmentType === 'emprunt') {
+                const loanAmount = document.getElementById('loan-amount').value;
+                additionalInfo = `Montant de l'emprunt: ${loanAmount} EUR`;
+            } else if (appointmentType === 'retrait') {
+                const withdrawalAmount = document.getElementById('withdrawal-amount').value;
+                additionalInfo = `Montant à retirer: ${withdrawalAmount} EUR`;
+            } else if (appointmentType === 'creation-compte') {
+                const accountType = document.getElementById('account-type').value;
+                additionalInfo = `Type de compte souhaité: ${accountType}`;
+            }
+
+            // Enregistrement des rendez-vous
+            const appointmentData = {
+                name,
+                discord,
+                appointmentType,
+                date: dateTime,
+                additionalInfo,
+            };
+
+            const history = JSON.parse(localStorage.getItem('history')) || [];
+            history.push(appointmentData);
+            localStorage.setItem('history', JSON.stringify(history));
+
+            updateHistory();
+
+            // Notification
+            sendNotification(appointmentData);
+
+            alert('Rendez-vous pris avec succès !');
+            form.reset();
+        });
+
+        // Mettre à jour l'historique des rendez-vous
+        function updateHistory() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = '';
+
+            const history = JSON.parse(localStorage.getItem('history')) || [];
+            history.forEach(appointment => {
+                const appointmentDate = new Date(appointment.date);
+                const dateFormatted = appointmentDate.toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                const bubbleClass = appointmentDate < new Date() ? 'past' : 
+                                    (appointmentDate.toDateString() === new Date().toDateString() ? 'today' : 'future');
+
+                const historyBubble = `
+                    <div class="history-bubble ${bubbleClass}">
+                        <strong>${appointment.name}</strong> - ${appointment.appointmentType}<br>
+                        <span>${dateFormatted} à ${appointmentDate.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span><br>
+                        <span>${appointment.additionalInfo}</span>
+                    </div>
+                `;
+
+                historyList.innerHTML += historyBubble;
+            });
+        }
+
+        // Envoyer des notifications
+        function sendNotification(appointmentData) {
+            if (Notification.permission === 'granted') {
+                const appointmentDate = new Date(appointmentData.date);
+                const appointmentDateFormatted = appointmentDate.toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+
+                const notificationTime = appointmentDate.getTime() - (new Date()).getTime();
+                const notificationTitle = `Rendez-vous ${appointmentData.appointmentType}`;
+                const notificationBody = `Vous avez un rendez-vous le ${appointmentDateFormatted}.`;
+
+                setTimeout(() => {
+                    new Notification(notificationTitle, {
+                        body: notificationBody,
+                        icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Crédit_Agricole.svg/2560px-Crédit_Agricole.svg.png'
+                    });
+                }, notificationTime);
+
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        sendNotification(appointmentData);
+                    }
+                });
+            }
+        }
+
+        // Initialiser l'historique à l'ouverture
+        updateHistory();
+    </script>
+</body>
+</html>
