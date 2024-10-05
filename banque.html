@@ -107,9 +107,17 @@
     </div>
 </div>
 
-    <div id="account-info" class="bulle-id" style="display:none;">
+ <div id="account-info" class="bulle-id" style="display:none;">
         <div class="bold-uppercase">Compte de dépôt<br>
             ID: <span id="user-id"></span>
+        </div>
+        <div class="separator"></div>
+        <div class="montant" id="solde">Solde Totaux : <span id="total-balance">0 €</span></div>
+</div>
+
+    <div id="account-info1" class="bulle-id" style="display:none;">
+        <div class="bold-uppercase">Compte de dépôt (CB)<br>
+            ID: <span id="user-id1"></span>
         </div>
         <div class="separator"></div>
         <div class="montant" id="solde">Solde Bancaire : <span id="bank-balance">0 €</span></div>
@@ -120,7 +128,7 @@
         <div class="bold-uppercase">Compte de dépôt (RETIRÉ)<br>
             ID: <span id="user-id2"></span>
  <div class="separator"></div>
-        <div class="montant" id="cash">Cash retiré : <span id="cash-balance">0 €</span></div>
+        <div class="montant" id="cash">Solde retiré (En cash) : <span id="cash-balance">0 €</span></div>
     </div>
 
     <script>
@@ -163,6 +171,8 @@
                 const user = await userResponse.json();
                 document.getElementById('user-id').innerText = user.id;
 document.getElementById('user-id2').innerText = user.id;
+document.getElementById('user-id1').innerText = user.id;
+
                 document.getElementById('welcome-message').innerText = `Bonjour, ${user.username}`;
                 document.getElementById('welcome-message').style.display = 'block';
 
@@ -173,6 +183,7 @@ document.getElementById('user-id2').innerText = user.id;
 
                 document.getElementById('account-info').style.display = 'block';
 document.getElementById('account-info2').style.display = 'block';
+document.getElementById('account-info1').style.display = 'block';
                 document.getElementById('login-button').style.display = 'none';
                 document.getElementById('logout-button').style.display = 'block';
             }
@@ -191,6 +202,8 @@ document.getElementById('account-info2').style.display = 'block';
                 if (!response.ok) throw new Error('Erreur de réseau');
                 
                 const user = await response.json();
+
+document.getElementById('total-balance').innerText = user.total ? `${user.total} €` : 'Erreur de solde';
                 document.getElementById('bank-balance').innerText = user.bank ? `${user.bank} €` : 'Erreur de solde';
                 document.getElementById('cash-balance').innerText = user.cash ? `${user.cash} €` : 'Erreur de cash';
             } catch (error) {
